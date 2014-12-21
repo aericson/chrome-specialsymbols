@@ -27,9 +27,20 @@
       - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
      -->
     <script src="jquery-1.11.2.min.js"></script>
+    <script src="keypress-2.1.0.min.js"></script>
     <script src="popup.js"></script>
   </head>
   <body>
+  <h4>Click the symbol you would like to insert.</h4>
+  <p>For faster usage you can filter by line and column. For example
+  opening this window and typing "1 11" will select the item at symbol 1
+  and column 11. Note that for example if you type "1 1" we can't know if
+  you are done. So if you would like to select line 1 column 1 type "1 1 ".
+  You can also open this window with Ctrl+Shift+Y.</p>
+  <div class="table-responsive">
+  <table id="mainTable" class="table table-bordered">
+  </table>
+  </div>
   </body>
 </html>
 

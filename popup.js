@@ -1,5 +1,7 @@
 // Copyright (c) 2014 André Ericson <de.ericson@gmail.com>
 
+var COLUMN_CELLS = 15;
+
 // http://symbolcodes.tlt.psu.edu/accents/codealt.html
 var symbols = [
     // Accents: Grave
@@ -42,23 +44,146 @@ function click(e) {
             chrome.tabs.sendMessage(tabs[0].id, {character: e.target.textContent},
              function(){
               console.log("done");
-              window.close();
+              // window.close();
             });
         });
     });
   });
 }
 
+function createBtn(symbol) {
+    var elem = $('<button type="button">');
+    elem.addClass("btn btn-default");
+    elem.text(symbol);
+    elem.on('click', click);
+    return elem;
+}
+
+var query = '';
+var lines = [];
+var searching = 'lines';
+var lineChoice = 0;
+var columnChoice = 0;
+
+function resetFilter() {
+  query = '';
+  lines = [];
+  searching = 'lines';
+  lineChoice = 0;
+  columnChoice = 0;
+  $('#mainTable').find('*').removeClass("active");
+  $('#mainTable').find('*').removeClass("hide");
+}
+
+function matchQuery(query, str) {
+  if (query.trim() === '')
+    return true;
+  if (query[query.length - 1] === ' ') {
+    return query.trim() === str;
+  }
+  return str.indexOf(query) === 0;
+}
+
+function searchAndMarkActiveLine(line) {
+  var matches = 0;
+  line.each(function (i, elem) {
+    if (i === 0)
+      return;
+    elem = $(elem);
+    if (matchQuery(query, elem.find('th').first().text())) {
+      elem.addClass("active");
+      elem.removeClass("hide");
+      matches++;
+    } else {
+      elem.removeClass("active");
+      elem.addClass("hide");
+    }
+  });
+  return matches;
+}
+
+function searchAndMarkActiveColumn(line) {
+  var matches = 0;
+  line.each(function (i, elem) {
+    $(elem).children().each(function (i, elem) {
+      elem = $(elem);
+      if (matchQuery(query, String(i))) {
+        matches++;
+        elem.addClass("active");
+        elem.removeClass("hide");
+      } else {
+        elem.removeClass("active");
+        elem.addClass("hide");
+      }
+    });
+  });
+  return matches;
+}
+
+
+function shiva(key){
+  query += key;
+  if (query.trim() === '')
+    query = '';
+  var matches = 0;
+  if (searching === 'lines') {
+    matches = searchAndMarkActiveLine($('tr'));
+    if (matches === 1) {
+      searching = 'columns';
+      lineChoice = parseInt(query);
+      query = '';
+    }
+  } else if (searching == 'columns') {
+    matches = searchAndMarkActiveColumn($('tr'));
+    if (matches == 1) {
+      searching = 'none';
+      columnChoice = parseInt(query);
+      query = '';
+    }
+  }
+}
+
+var listener;
 
 document.addEventListener('DOMContentLoaded', function () {
   // kittenGenerator.requestKittens();
-  for (var i = 0; i < symbols.length; ++i) {
-    var elem = $('<button type="button">');
-    elem.addClass("btn btn-default");
-    elem.text(symbols[i]);
-    elem.on('click', click);
-    $('body').append(elem);
+  var table = $('#mainTable');
+  var row = $("<tr>");
+  row.append($("<th>"));
+  for (var i = 1; i <= COLUMN_CELLS; i++) {
+    row.append($("<th>").text(i));
   }
+
+  for (i = 0; i < symbols.length; i++) {
+    if (i % COLUMN_CELLS === 0){
+        lines.push(String(i+1));
+        table.append(row);
+        row = $("<tr>");
+        row.append($("<th>").text(i/COLUMN_CELLS + 1));
+    }
+    row.append($("<td>").append(createBtn(symbols[i])));
+  }
+  table.append(row);
+
+  listener = new window.keypress.Listener();
+  $(['1', '2', '3', '4', '5', '6', '7', '8', '9',
+     '0', 'space']).each(function(i, elem) {
+    listener.register_combo({
+      "keys": elem,
+      "on_keydown": function(){
+        if (elem === 'space')
+          return shiva(' ');
+        shiva(elem);
+      },
+    });
+  });
+  listener.register_combo({
+    "keys": 'backspace',
+    "prevent_default": true,
+    "on_keydown": function(){
+      resetFilter();
+    },
+  });
 });
 
 
