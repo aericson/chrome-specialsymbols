@@ -3,7 +3,7 @@
 
   "name": "Special Symbols input",
   "description": "This extension shows a little keyboard with special characters.",
-  "version": "1.0",
+  "version": "1.1",
   "icons": { "16": "icon16.png",
              "48": "icon48.png",
              "128": "icon128.png"} ,
@@ -17,7 +17,7 @@
   },
 
   "commands": {
-    "_execute_page_action": {
+    "_execute_browser_action": {
       "suggested_key": {
         "default": "Alt+Shift+Y",
         "linux": "Alt+Shift+Y"

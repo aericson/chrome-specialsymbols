@@ -52,7 +52,7 @@ function trackClick(e) {
   _gaq.push(['_trackEvent', e.target.textContent, 'clicked']);
 }
 
-function fakeClick(e) {
+function trackFakeClick(e) {
   _gaq.push(['_trackEvent', e.target.textContent, 'fakeClicked']);
 }
 
@@ -75,7 +75,7 @@ function fakeClick(line, column) {
   line--; column--;
   var fake_event = { 'target': {}};
   fake_event.target.textContent = symbols[line * COLUMN_CELLS + column];
-  fakeClick(fake_event);
+  trackFakeClick(fake_event);
   click(fake_event);
 }
 
