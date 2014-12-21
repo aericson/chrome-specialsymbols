@@ -36,6 +36,28 @@ var symbols = [
 
 ];
 
+// Analytics
+
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-57897440-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = 'https://ssl.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+function trackClick(e) {
+  _gaq.push(['_trackEvent', e.target.textContent, 'clicked']);
+}
+
+function fakeClick(e) {
+  _gaq.push(['_trackEvent', e.target.textContent, 'fakeClicked']);
+}
+
+// end Analytics
+
 function click(e) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.executeScript(tabs[0].id, {file: "jquery-1.11.2.min.js"}, function(){
@@ -53,6 +75,7 @@ function fakeClick(line, column) {
   line--; column--;
   var fake_event = { 'target': {}};
   fake_event.target.textContent = symbols[line * COLUMN_CELLS + column];
+  fakeClick(fake_event);
   click(fake_event);
 }
 
@@ -61,6 +84,7 @@ function createBtn(symbol) {
     elem.addClass("btn btn-default");
     elem.text(symbol);
     elem.on('click', click);
+    elem.on('click', trackClick);
     return elem;
 }
 
