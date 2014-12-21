@@ -37,18 +37,23 @@ var symbols = [
 ];
 
 function click(e) {
-  console.log("clicked");
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.executeScript(tabs[0].id, {file: "jquery-1.11.2.min.js"}, function(){
         chrome.tabs.executeScript(tabs[0].id, {file: "inject.js"}, function(){
             chrome.tabs.sendMessage(tabs[0].id, {character: e.target.textContent},
              function(){
-              console.log("done");
-              // window.close();
+              window.close();
             });
         });
     });
   });
+}
+
+function fakeClick(line, column) {
+  line--; column--;
+  var fake_event = { 'target': {}};
+  fake_event.target.textContent = symbols[line * COLUMN_CELLS + column];
+  click(fake_event);
 }
 
 function createBtn(symbol) {
@@ -105,10 +110,13 @@ function searchAndMarkActiveLine(line) {
 function searchAndMarkActiveColumn(line) {
   var matches = 0;
   line.each(function (i, elem) {
-    $(elem).children().each(function (i, elem) {
+    $(elem).children().each(function (j, elem) {
       elem = $(elem);
-      if (matchQuery(query, String(i))) {
-        matches++;
+      if (matchQuery(query, String(j))) {
+        if (i === 0) {
+          // matches will repeat on other lines
+          matches++;
+        }
         elem.addClass("active");
         elem.removeClass("hide");
       } else {
@@ -138,6 +146,7 @@ function shiva(key){
     if (matches == 1) {
       searching = 'none';
       columnChoice = parseInt(query);
+      fakeClick(lineChoice, columnChoice);
       query = '';
     }
   }
