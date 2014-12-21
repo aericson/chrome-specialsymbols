@@ -2,8 +2,8 @@
   "manifest_version": 2,
 
   "name": "Special Symbols input",
-  "description": "This extension show a little keyboard with special characters.",
-  "version": "0.1",
+  "description": "This extension shows a little keyboard with special characters.",
+  "version": "1.0",
   "icons": { "16": "icon16.png",
              "48": "icon48.png",
              "128": "icon128.png"} ,
